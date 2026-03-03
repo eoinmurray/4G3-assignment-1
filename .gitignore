@@ -4,6 +4,7 @@ __pycache__/
 build/
 dist/
 wheels/
+.DS_Store
 *.egg-info
 .vscode
 # Virtual environments
