@@ -1,7 +1,12 @@
-import stat
-from audioop import error
 import numpy as np
 from dataclasses import dataclass
+import shutil
+from pathlib import Path
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+FIG_DIR = Path("src/figures")
 
 
 @dataclass
@@ -63,11 +68,10 @@ def initialize_reward(t: np.ndarray, t_reward: float, sigma: float) -> np.ndarra
 def intitialize_state_matrix(stim: np.ndarray, n_mem: int) -> np.ndarray:
   """Build the stimulus-by-time-delay state matrix S for all time steps.
 
-  Constructs the matrix S used to represent the recent history of the
-  stimulus signal, as described in Exercise I.3. Each row corresponds
-  to an absolute time step t, and each column corresponds to a relative
-  delay tau (how many steps ago). The entry S[t, tau] records the
-  stimulus level at time (t - tau), i.e. what the stimulus was tau
+  Constructs the matrix S used to represent the recent history of the stimulus
+  signal. Each row corresponds to an absolute time step t, and each column
+  corresponds to a relative delay tau (how many steps ago). The entry S[t, tau]
+  records the stimulus level at time (t - tau), i.e. what the stimulus was tau
   steps in the past when viewed from time t.
 
   For the tapped delay line representation, each entry of S is used
@@ -213,19 +217,6 @@ def run_td(params: Parameters | None = None) -> State:
     s.error_storage[trial] = delta
 
   return s
-
-
-# Keep backwards-compatible alias
-run_td_tapped = run_td
-
-import shutil
-from pathlib import Path
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-FIG_DIR = Path("src/figures")
-
 
 def _setup_style() -> None:
   mpl.rcParams.update({
