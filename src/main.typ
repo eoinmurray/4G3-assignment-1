@@ -76,7 +76,7 @@ $
   theta_k <- theta_k + epsilon [r_t + gamma accent(V, hat)^pi (s_(t+1)) - accent(V, hat)^pi (s_t)] bb(1)(s_t = k)
 $
 
-Only the parameter for the current state is updated, which is exactly lookup-table TD(0).
+Only the parameter for the current state is updated, which is lookup-table TD(0).
 
 = Question 2
 
@@ -123,8 +123,8 @@ error $delta(t)$ correspondingly shifts: the positive peak at reward time
 shrinks (reward becomes expected) while a new peak emerges at stimulus onset
 (the stimulus itself becomes a surprising predictor of future value).
 
-*(d)* The TD error $delta(t)$ corresponds to dopamine cell activity. This
-agrees with experimental observations: initially dopamine fires at reward
+*(d)* The TD error $delta(t)$ corresponds to dopamine activity. This
+agrees with the lectures: initially dopamine fires at reward
 delivery; after conditioning, the dopamine response shifts to stimulus onset
 while the reward-time response vanishes. In @q3b, we see exactly this
 progression --- the $delta(t)$ peak migrates from $t = 20 "s"$ to $t = 10 "s"$
@@ -150,7 +150,7 @@ a cleaner shift with less residual noise. During intermediate trials the
 convergence is faster in terms of the qualitative shape because boxcar features
 share information across time lags.
 
-*(c)* The $delta(t)$ panel in @q4a shows the dopamine "shift": the reward-time
+*(c)* The $delta(t)$ panel in @q4a shows the dopamine shift: the reward-time
 peak progressively disappears and is replaced by a stimulus-onset peak. This is
 smoother than in Q3 because the boxcar features allow each weight update to
 influence predictions at multiple time steps, so the shift happens more
@@ -160,7 +160,7 @@ gradually and completely within the 201 trials.
 boxcar features are much larger in magnitude (they sum up to $tau + 1$
 stimulus values rather than being 0 or 1). The effective step size is
 $epsilon dot phi_k (s_t)$; with boxcar features $phi_k$ can be as large as the
-memory span, so a large $epsilon$ causes weight oscillations and divergence.
+memory span, so a large $epsilon$ causes destabilisation.
 Reducing $epsilon$ compensates for the increased feature magnitude and
 stabilises learning.
 
@@ -249,20 +249,17 @@ with the learned value of the stimulus, which is proportional to the expected
 reward $p dot r$. The reward-time DA peak is _non-monotonic_ and resembles an
 inverted-U. At $p = 0$ and $p = 1$ reward-time DA is near zero (no surprise);
 it peaks at intermediate $p$ because the mismatch between actual reward (when
-delivered) and expected reward $p dot r$ is largest there. More precisely,
-reward-time $delta$ on rewarded trials is $r - p dot r = (1 - p) r$, but these
+delivered) and expected reward $p dot r$ is largest there. 
+Reward-time $delta$ on rewarded trials is $r - p dot r = (1 - p) r$, but these
 occur only a fraction $p$ of the time, so the _average_ reward-time DA
 reflects a mixture of positive and negative $delta$ values weighted by $p$ and
-$1 - p$ respectively, passed through the compressive nonlinearity.
+$1 - p$ respectively, passed through the nonlinearity.
 
 *(c)* If dopamine encoded _uncertainty_ rather than prediction error, we would
 expect the stimulus-time DA peak to follow an inverted-U shape (maximal at
-$p = 0.5$, where outcome uncertainty $p(1-p)$ is highest). Instead, @q6b shows
+$p = 0.5$, where outcome uncertainty is highest). Instead, @q6b shows
 that the stimulus peak increases monotonically with $p$, inconsistent with an
-uncertainty code. The reward-time inverted-U could superficially resemble
-uncertainty, but it arises naturally from the asymmetric averaging of positive
-and negative prediction errors through the DA nonlinearity, not from
-uncertainty encoding per se.
+uncertainty code.
 
 = Question 7
 
@@ -283,9 +280,8 @@ $phi^*_(i tau)(bold(S); bold(v)) = sum_(u=0)^(tau) h(sum_(m,n=1)^(d) v_(m n)^((i
 first computes a weighted sum of the stimulus frame at lag $u$, using
 spatial weights $v_(m n)^((i))$, then applies a nonlinearity $h(dot)$. The
 weights ${v_(m n)^((i))}_(m,n=1)^d$ define a spatial receptive field for
-feature $i$ --- they select which pixels (and with what polarity/gain)
-contribute to the feature's activation. This is analogous to a convolutional
-filter. The summation over lags $u = 0, dots, tau$ integrates the filtered
+feature $i$ --- they select which pixels
+contribute to the feature's activation. The summation over lags $u = 0, dots, tau$ integrates the filtered
 response over time, and $h(dot)$ introduces a nonlinear detection threshold.
 
 *(b.ii)* With $a_(i u) = sum_(m,n=1)^d v_(m n)^((i)) S_(m n u)$ and
@@ -323,8 +319,7 @@ $
   v_(m n)^((i)) <- v_(m n)^((i)) + epsilon delta_t sum_(tau) w_(i tau) phi^square.stroked_(m n tau)
 $
 
-Advantage: the model is jointly linear in $bold(w)$ and $bold(v)$ (though their
-product is bilinear), keeping gradients simple. Disadvantage: without a
+Advantage: the model is jointly linear in $bold(w)$ and $bold(v)$, keeping gradients simple. Disadvantage: without a
 nonlinearity, different features $phi^*_i$ cannot capture non-overlapping
 stimulus patterns --- two features with spatial weights $bold(v)^((i))$ and
 $bold(v)^((j))$ that are both active for the same stimulus cannot be
@@ -347,7 +342,7 @@ $delta(t) = r(t - Delta t) + Delta accent(V, hat)(t)$ is a _scalar_ shared
 across all features. Each weight update
 $w_k <- w_k + epsilon delta_t phi_k (s_t)$ depends on $delta$ and the
 feature's own activation. A dopamine neuron that receives input from a specific
-feature $k$ would modulate its response by $phi_k$, naturally producing
+feature $k$ would modulate its response by $phi_k$, producing
 feature-specific apparent dopamine responses even though $delta$ itself is
 global. So standard TD can account for feature-specific responses if different
 dopamine neurons receive input from different features, without requiring
@@ -363,8 +358,7 @@ $
 $
 
 where $r_k$ is the portion of reward attributed to feature $k$. If we set
-$r_k = r dot phi_k (s_t) slash (sum_j phi_j (s_t))$ (reward allocated
-proportionally to active features), then summing over $k$ recovers the global
+$r_k = r dot phi_k (s_t) slash (sum_j phi_j (s_t))$, then summing over $k$ recovers the global
 TD error: $sum_k delta_k = delta$. The weight update
 $w_k <- w_k + epsilon delta_k phi_k$ produces equivalent learning because
 each $delta_k$ drives only its own weight. This model is backward compatible:
@@ -407,7 +401,10 @@ report:
 - `give a hint for question 2`
 - `walk me through example of value functions from reinforcement learning`
 - `how do we go from this to TD learning?`
+- `give a worked example`
+- `give another worked example`
 - `explain question 3`
+- `explain in more detail`
 - `in src/lib/assignment.py check the indexing for the sliding window in state S`
 - `src/lib/assignment.py defines an experiment in code, add the plots needed by
   src/pdfs/assignment.pdf question 3 as publication quality matplotlib plots
@@ -421,7 +418,17 @@ report:
   n\_trials=1000 and seed=11`
 - `now for question-6 do a sweep of the reward probabilities of
   [0.0,0.25,0.5,0.75,1.0] and make the appropriate plots`
+- `check all the code for adherence to src/assignment.pdf and fix any bugs`
+- `improve the code quality for readability and concisness`
+- `make the code neater`
 - `give a hint for question 7`
+- `explain in more detail` (ran multiple times)
+- `help me with the maths`
 - `give a hint for question 8`
+- `explain in more detail` (ran multiple times)
+- `help me with the maths`
+- `review the report for correctness, and suggest improvements`
 - `refine the report so far` (ran multiple times)
-- `refine the report and code for publication`
+- `refine the report for coherence and conciseness`
+- `make the report slightly more concise`
+- `refine the report and code for publication, make it beautiful`
